@@ -1,0 +1,4 @@
+index.html: https://raw.githubusercontent.com/moisesvalere/proyecto/main/index.html
+script.js: https://raw.githubusercontent.com/moisesvalere/proyecto/main/script.js
+styles.css: https://raw.githubusercontent.com/moisesvalere/proyecto/main/styles.css
+deporte.m3u: https://raw.githubusercontent.com/moisesvalere/proyecto/main/deporte.m3u
