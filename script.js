@@ -29,7 +29,7 @@ let channelCategories = {};
 // URL del archivo M3U en GitHub
 const githubUrl = 'https://raw.githubusercontent.com/moisesvalere/portales/main/portales';
 
-// Function to fetch and update channel categories
+// Función para obtener y actualizar las categorías de canales
 function fetchAndUpdateChannels() {
     fetch(githubUrl)
         .then(response => {
@@ -46,7 +46,7 @@ function fetchAndUpdateChannels() {
         .catch(error => console.error('Error fetching M3U file:', error));
 }
 
-// Function to parse M3U file
+// Función para analizar el archivo M3U
 function parseM3U(data) {
     const lines = data.split('\n');
     const channels = [];
@@ -101,7 +101,7 @@ function parseM3U(data) {
     return { channels, iframes };
 }
 
-// Function to organize channel categories
+// Función para organizar las categorías de canales
 function organizeChannelCategories(channels, iframes) {
     channelCategories = {};
 
@@ -125,28 +125,37 @@ function organizeChannelCategories(channels, iframes) {
     });
 }
 
-// Function to display channel menu
+// Función para mostrar el menú de canales
 function displayChannelMenu() {
     const menu = document.getElementById('channel-menu');
     menu.innerHTML = '';
 
+    // Si no hay categorías, muestra un mensaje
     if (Object.keys(channelCategories).length === 0) {
         menu.textContent = 'No se encontraron categorías.';
         return;
     }
 
+    // Crea elementos de menú para cada categoría de canal
     for (const [channelId, channelCategory] of Object.entries(channelCategories)) {
-        const menuItem = document.createElement('li');
-        menuItem.textContent = channelCategory.name;
-        menuItem.addEventListener('click', () => {
-            displayTvgCategories(channelId);
-        });
+        // Crea el elemento <li> con la clase "nav-item"
+        const menuItem = document.createElement('nav');
+        menuItem.className = 'nav-item';
 
-        menu.appendChild(menuItem);
+        const li = document.createElement('li');
+li.className = 'nav-link';
+li.textContent = channelCategory.name;
+
+li.addEventListener('click', () => {
+    displayTvgCategories(channelId);
+});
+
+menu.appendChild(li);
+
     }
 }
 
-// Function to display tvg-id categories
+// Función para mostrar las categorías de tvg-id
 function displayTvgCategories(channelId) {
     const container = document.getElementById('content-container');
     container.innerHTML = '';
@@ -157,14 +166,27 @@ function displayTvgCategories(channelId) {
         for (const [tvgId, tvgCategory] of Object.entries(channelCategory.tvgCategories)) {
             const tvgElement = document.createElement('div');
             tvgElement.className = 'item category';
-            tvgElement.textContent = tvgCategory.name;
 
+            // Crear contenedor para icono y texto
+            const innerContainer = document.createElement('div');
+            innerContainer.className = 'inner-container'; // Clase adicional para estilizar si es necesario
+
+            // Crear y añadir el icono de portada
             const portadaElement = document.createElement('img');
             portadaElement.src = tvgCategory.portada;
             portadaElement.alt = tvgCategory.name;
             portadaElement.className = 'portada-icon';
 
-            tvgElement.appendChild(portadaElement);
+            // Crear y añadir el texto del nombre
+            const textElement = document.createElement('p');
+            textElement.textContent = tvgCategory.name;
+
+            // Añadir icono y texto al contenedor interno
+            innerContainer.appendChild(portadaElement);
+            innerContainer.appendChild(textElement);
+
+            // Añadir el contenedor interno al div principal
+            tvgElement.appendChild(innerContainer);
 
             tvgElement.addEventListener('click', () => {
                 displayCategoryItems(channelId, tvgId);
@@ -177,7 +199,8 @@ function displayTvgCategories(channelId) {
     }
 }
 
-// Function to display items in a category
+
+// Función para mostrar los elementos en una categoría
 function displayCategoryItems(channelId, tvgId) {
     const container = document.getElementById('content-container');
     container.innerHTML = '';
@@ -212,7 +235,7 @@ function displayCategoryItems(channelId, tvgId) {
     }
 }
 
-// Function to update player with a new URL
+// Función para actualizar el reproductor con una nueva URL
 function updatePlayer(url) {
     document.getElementById('player-container').style.display = 'flex';
     jwplayer("aRzklaXf").setup({
@@ -224,7 +247,7 @@ function updatePlayer(url) {
     });
 }
 
-// Function to update iframe with a new URL
+// Función para actualizar el iframe con una nueva URL
 function updateIframe(url) {
     const iframe = document.getElementById('videoFrame');
     iframe.src = url;

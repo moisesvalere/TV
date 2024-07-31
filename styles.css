@@ -7,6 +7,7 @@ body {
     padding: 0;
     display: flex;
     height: 100vh;
+    overflow: hidden; /* Evita barras de desplazamiento innecesarias */
 }
 
 /* Estilos para el contenedor principal */
@@ -23,6 +24,7 @@ body {
     padding: 10px;
     width: 200px;
     min-height: 100vh;
+    overflow-y: auto; /* Permite desplazamiento si el menú es demasiado largo */
 }
 
 #channel-menu .navbar-brand {
@@ -38,7 +40,7 @@ body {
 }
 
 #channel-menu .navbar-nav .nav-item {
-    margin-bottom: 40px; /* Aumentar la separación entre elementos */
+    margin-bottom: 20px; /* Reduce la separación entre elementos */
 }
 
 #channel-menu .navbar-nav .nav-link {
@@ -61,6 +63,7 @@ body {
     flex-wrap: wrap;
     justify-content: center;
     padding: 20px;
+    overflow-y: auto; /* Permite desplazamiento si el contenido es demasiado largo */
 }
 
 /* Estilos para los elementos de contenido */
@@ -80,8 +83,6 @@ body {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s, box-shadow 0.3s;
-    display: block; /* Asegurar que la imagen sea un bloque separado */
-    margin: 0 auto; /* Centramos la imagen */
 }
 
 .item img:hover {
@@ -90,9 +91,8 @@ body {
 }
 
 .item p {
-    margin-top: 10px; /* Asegurar que el texto esté debajo de la imagen */
+    margin-top: 10px;
     font-size: 1.1em;
-    text-align: center;
 }
 
 /* Estilos para la portada */
@@ -146,15 +146,15 @@ body {
 }
 
 #videoFrame {
-    width: 80%;
-    height: 80%;
+    width: 100%;
+    height: 100%;
     border: none;
 }
 
 /* Estilos responsivos */
 @media (max-width: 768px) {
     #channel-menu {
-        width: 100px;
+        width: 150px; /* Ajustar el tamaño del menú en dispositivos pequeños */
     }
     
     #content-container {
@@ -162,18 +162,18 @@ body {
     }
 
     .item img {
-        width: 100px; /* Ajustar el tamaño del ícono en dispositivos pequeños */
-        height: 100px;
+        width: 120px; /* Ajustar el tamaño del ícono en dispositivos pequeños */
+        height: 120px;
     }
 
     .item p {
-        font-size: 0.9em;
+        font-size: 1em;
     }
 }
 
 @media (max-width: 480px) {
     #channel-menu {
-        width: 80px;
+        width: 100px; /* Ajustar el tamaño del menú en dispositivos muy pequeños */
     }
     
     #channel-menu .navbar-brand {
