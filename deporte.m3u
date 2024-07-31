@@ -12,7 +12,6 @@ https://embed.sdfgnksbounce.com/embed2/directvsports.html
 #EXTINF:-1 channel-id="TV EN VIVO" tvg-id="Prueba" portada="https://imgur.com/pwEVMGo.png" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/6/63/Logo_La_Linea_100x100.png" group-title="",Un Canal de Prueba
 https://cbsn-us.cbsnstream.cbsnews.com/out/v1/55a8648e8f134e82a470f83d562deeca/master_24.m3u8
 
-
 #EXTINF:-1 channel-id="SERIES" tvg-id="THE BOYS TEMPORADA 1" portada="https://imgur.com/GnhJ3Ue.png" tvg-logo="https://ww1.peliculasenhd.org/wp-content/uploads/2020/04/dzOxNbbz1liFzHU1IPvdgUR647b-200x300.jpg" group-title="Serie",The Boys temp 1x1
 https://archive.org/download/the.-boys.-1x-05.lati/The.Boys.1x01.lati.mp4
 
@@ -28,11 +27,8 @@ https://pelisplay.info/streamhd?id=MTczMjI5&option=castell
 #IFRAME:-1 channel-id="SERIES" tvg-id="Los Juegos de la Muerte" portada="https://imgur.com/UxtVRXu.png" tvg-logo="https://imgur.com/UxtVRXu.png" group-title="",Capitulo 1
 https://vk.com/video_ext.php?oid=730471731&id=456240963&hash=e64749d0e9c5fe38
 
-
-
-
-
-
+#IFRAME:-1 channel-id="SERIES" tvg-id="Los Juegos de la Muerte" portada="https://imgur.com/UxtVRXu.png" tvg-logo="https://imgur.com/UxtVRXu.png" group-title="",Capitulo 2
+https://vk.com/video_ext.php?oid=730471731&id=456240964&hash=96924b87aed5d0cc
 
 
 #IFRAME:-1 channel-id="PELICULAS" tvg-id="2024" portada="https://imgur.com/YFeXX0c.png" tvg-logo="https://i.imgur.com/XnGOxrg.png" group-title="",Deadpool y Wolverine
