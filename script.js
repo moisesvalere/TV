@@ -95,6 +95,27 @@ function parseM3U(data) {
             if (logo && title && url && channelId) {
                 iframes.push({ logo, portada, title, url, channelId, tvgId });
             }
+        } else if (lines[i].startsWith('#NORMAL:-1')) {
+            const logoMatch = lines[i].match(/tvg-logo="([^"]+)"/);
+            const logo = logoMatch ? logoMatch[1] : '';
+
+            const portadaMatch = lines[i].match(/portada="([^"]+)"/);
+            const portada = portadaMatch ? portadaMatch[1] : '';
+            
+            const titleMatch = lines[i].match(/group-title="[^"]*",([^,]+)/);
+            const title = titleMatch ? titleMatch[1] : '';
+            
+            const tvgIdMatch = lines[i].match(/tvg-id="([^"]*)"/);
+            const tvgId = tvgIdMatch ? tvgIdMatch[1] : '';
+
+            const channelIdMatch = lines[i].match(/channel-id="([^"]*)"/);
+            const channelId = channelIdMatch ? channelIdMatch[1] : '';
+
+            const url = lines[i + 1] ? lines[i + 1].trim() : '';
+
+            if (logo && title && url && channelId) {
+                iframes.push({ logo, portada, title, url, channelId, tvgId, normal: true });
+            }
         }
     }
 
@@ -143,15 +164,15 @@ function displayChannelMenu() {
         menuItem.className = 'nav-item';
 
         const li = document.createElement('li');
-li.className = 'nav-link';
-li.textContent = channelCategory.name;
+        li.className = 'nav-link';
+        li.textContent = channelCategory.name;
 
-li.addEventListener('click', () => {
-    displayTvgCategories(channelId);
-});
+        li.addEventListener('click', () => {
+            displayTvgCategories(channelId);
+        });
 
-menu.appendChild(li);
-
+        menuItem.appendChild(li);
+        menu.appendChild(menuItem);
     }
 }
 
@@ -199,7 +220,6 @@ function displayTvgCategories(channelId) {
     }
 }
 
-
 // Función para mostrar los elementos en una categoría
 function displayCategoryItems(channelId, tvgId) {
     const container = document.getElementById('content-container');
@@ -219,7 +239,7 @@ function displayCategoryItems(channelId, tvgId) {
                 if (item.url.endsWith('.m3u8') || item.url.endsWith('.mp4')) {
                     updatePlayer(item.url);
                 } else {
-                    updateIframe(item.url);
+                    updateIframe(item.url, item.normal);
                 }
             });
 
@@ -248,51 +268,53 @@ function updatePlayer(url) {
 }
 
 // Función para actualizar el iframe con una nueva URL
-function updateIframe(url) {
+function updateIframe(url, normal = false) {
     const iframe = document.getElementById('videoFrame');
     iframe.src = url;
     document.getElementById('iframe-container').style.display = 'flex';
 
-    // Agregar función para eliminar anuncios del iframe
-    iframe.onload = function() {
-        const iframeWindow = iframe.contentWindow;
+    if (!normal) {
+        // Agregar función para eliminar anuncios del iframe
+        iframe.onload = function() {
+            const iframeWindow = iframe.contentWindow;
 
-        function removeAds() {
-            try {
-                // Ejemplo de eliminación de anuncios específicos
-                const ads = iframeWindow.document.querySelectorAll('.ad, .advertisement, .adsbygoogle, [id^="google_ads"], [class^="ad-"]');
-                ads.forEach(ad => ad.remove());
+            function removeAds() {
+                try {
+                    // Ejemplo de eliminación de anuncios específicos
+                    const ads = iframeWindow.document.querySelectorAll('.ad, .advertisement, .adsbygoogle, [id^="google_ads"], [class^="ad-"]');
+                    ads.forEach(ad => ad.remove());
 
-                // Remover elementos de script que puedan cargar anuncios
-                const scripts = iframeWindow.document.querySelectorAll('script');
-                scripts.forEach(script => {
-                    if (script.src.includes('ad') || script.src.includes('ads')) {
-                        script.remove();
-                    }
-                });
+                    // Remover elementos de script que puedan cargar anuncios
+                    const scripts = iframeWindow.document.querySelectorAll('script');
+                    scripts.forEach(script => {
+                        if (script.src.includes('ad') || script.src.includes('ads')) {
+                            script.remove();
+                        }
+                    });
 
-                // Remover iframes de publicidad
-                const adIframes = iframeWindow.document.querySelectorAll('iframe');
-                adIframes.forEach(adIframe => {
-                    if (adIframe.src.includes('ad') || adIframe.src.includes('ads')) {
-                        adIframe.remove();
-                    }
-                });
+                    // Remover iframes de publicidad
+                    const adIframes = iframeWindow.document.querySelectorAll('iframe');
+                    adIframes.forEach(adIframe => {
+                        if (adIframe.src.includes('ad') || adIframe.src.includes('ads')) {
+                            adIframe.remove();
+                        }
+                    });
 
-                // Remover pop-ups y overlays de anuncios
-                const popups = iframeWindow.document.querySelectorAll('.popup, .overlay');
-                popups.forEach(popup => popup.remove());
-            } catch (error) {
-                console.error('Error removing ads:', error);
+                    // Remover pop-ups y overlays de anuncios
+                    const popups = iframeWindow.document.querySelectorAll('.popup, .overlay');
+                    popups.forEach(popup => popup.remove());
+                } catch (error) {
+                    console.error('Error removing ads:', error);
+                }
             }
-        }
 
-        removeAds();
+            removeAds();
 
-        // Ejemplo de ejecución periódica para remover anuncios que aparezcan dinámicamente
-        const removeAdsInterval = setInterval(removeAds, 2000);
+            // Ejemplo de ejecución periódica para remover anuncios que aparezcan dinámicamente
+            const removeAdsInterval = setInterval(removeAds, 2000);
 
-        // Detener la ejecución periódica después de un tiempo
-        setTimeout(() => clearInterval(removeAdsInterval), 30000);
-    };
+            // Detener la ejecución periódica después de un tiempo
+            setTimeout(() => clearInterval(removeAdsInterval), 30000);
+        };
+    }
 }
