@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     fetchAndUpdateChannels();
-    setInterval(fetchAndUpdateChannels, 30000); // Actualiza cada 30 segundos
+    setInterval(fetchAndUpdateChannels, 3000000); // Actualiza cada 30 segundos
 
     document.getElementById('player-container').style.display = 'none';
     document.getElementById('iframe-container').style.display = 'none';
