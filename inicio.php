@@ -1,3 +1,16 @@
+<?php
+session_start();
+
+// Verificar si la sesión es válida
+if (!isset($_SESSION['valid_session']) || $_SESSION['valid_session'] !== true) {
+    header("Location: error.php");
+    exit();
+}
+
+// Destruir la variable de sesión para invalidar el acceso en caso de recarga
+unset($_SESSION['valid_session']);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

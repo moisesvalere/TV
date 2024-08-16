@@ -408,6 +408,7 @@ main.min-main {
     .item {
         max-width: 100%; /* Una columna en pantallas pequeñas */
         height: auto; /* Ajusta la altura para pantallas pequeñas */
+ 
     }
 
     .item img {
