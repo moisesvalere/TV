@@ -2,7 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchAndUpdateChannels();
-    setInterval(fetchAndUpdateChannels, 3000000); // Actualiza cada 30 segundos
+    setInterval(fetchAndUpdateChannels, 30000); // Actualiza cada 30 segundos
 
     document.getElementById('player-container').style.display = 'none';
     document.getElementById('iframe-container').style.display = 'none';
@@ -24,10 +24,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const iframe = document.getElementById('videoFrame');
         iframe.src = '';
     });
+
+    // Función para detectar dispositivos móviles
+    function detectMobileDevice() {
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        return /android/i.test(userAgent) || /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+    }
+
+    // Función para redirigir al detectar cambio en el tamaño de la ventana
+    let resizeTimeout;
+    if (!detectMobileDevice()) {
+        // Solo añade el listener si no es un dispositivo móvil
+        window.addEventListener('resize', () => {
+            if (resizeTimeout) clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                window.location.href = "error.php";
+            }, 100); // Espera 100ms antes de redirigir para asegurarse de que es un cambio real
+        });
+    }
 });
 
 let channelCategories = {};
-
 
 function blockDevTools(e) {
     if (
@@ -65,25 +82,8 @@ window.onload = function() {
 };
 
 
-window.onload = function() {
-    window.addEventListener("keydown", blockDevTools);
-    window.addEventListener("contextmenu", disableRightClick);
-
-    // Comprobar si la página se recarga directamente
-    window.onbeforeunload = function() {
-        fetch('logout.php');
-    };
-
-    // Detectar si la página se abrió desde la caché del navegador
-    if (performance.navigation.type === 2) {
-        fetch('logout.php');
-        window.location.href = 'error.php';
-    }
-};
-
-
 // URL del archivo M3U en GitHub
-const githubUrl = 'https://raw.githubusercontent.com/moisesvalere/portales/main/portales';
+const githubUrl = 'https://raw.githubusercontent.com/Tequiroconmigo/portal/main/deporte.m3u';
 
 // Función para obtener y actualizar las categorías de canales
 function fetchAndUpdateChannels() {
