@@ -1,12 +1,13 @@
-
-
 document.addEventListener('DOMContentLoaded', () => {
+    // Actualiza la lista de canales cada 30 segundos
     fetchAndUpdateChannels();
-    setInterval(fetchAndUpdateChannels, 30000); // Actualiza cada 30 segundos
+    setInterval(fetchAndUpdateChannels, 30000);
 
+    // Ocultar inicialmente los contenedores de video y iframe
     document.getElementById('player-container').style.display = 'none';
     document.getElementById('iframe-container').style.display = 'none';
-
+    
+    // Función para cerrar el reproductor de video y salir del modo pantalla completa
     document.getElementById('close-player').addEventListener('click', () => {
         const playerContainer = document.getElementById('player-container');
         playerContainer.style.display = 'none';
@@ -15,15 +16,31 @@ document.addEventListener('DOMContentLoaded', () => {
         if (playerInstance) {
             playerInstance.remove();
         }
+
+        // Salir del modo pantalla completa si está activo
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        }
     });
 
+    // Función para cerrar el iframe y salir del modo pantalla completa
     document.getElementById('close-iframe').addEventListener('click', () => {
         const iframeContainer = document.getElementById('iframe-container');
         iframeContainer.style.display = 'none';
 
         const iframe = document.getElementById('videoFrame');
         iframe.src = '';
+
+        // Salir del modo pantalla completa si está activo
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        }
     });
+
+    // Variables para controlar el redimensionamiento y pantalla completa
+    let resizeTimeout;
+    let isFullscreenChanging = false;
+    let isManualExitFullscreen = false;
 
     // Función para detectar dispositivos móviles
     function detectMobileDevice() {
@@ -31,20 +48,168 @@ document.addEventListener('DOMContentLoaded', () => {
         return /android/i.test(userAgent) || /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
     }
 
-    // Función para redirigir al detectar cambio en el tamaño de la ventana
-    let resizeTimeout;
-    if (!detectMobileDevice()) {
-        // Solo añade el listener si no es un dispositivo móvil
-        window.addEventListener('resize', () => {
+    // Función para manejar el redimensionamiento
+    function handleResize() {
+        if (document.fullscreenElement || isFullscreenChanging || isManualExitFullscreen) {
+            return; // No redirigir si está en pantalla completa o en proceso de cambio
+        }
+
+        // Redirigir si hay un cambio en el tamaño de la ventana y no es un dispositivo móvil
+        if (!detectMobileDevice()) {
             if (resizeTimeout) clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 window.location.href = "error.php";
-            }, 100); // Espera 100ms antes de redirigir para asegurarse de que es un cambio real
-        });
+            }, 100); // Espera 100ms antes de redirigir
+        }
     }
+
+    // Función para manejar el cambio en el estado de pantalla completa
+    function handleFullscreenChange() {
+        if (isManualExitFullscreen) {
+            isManualExitFullscreen = false; // Desactivar la bandera después de salir manualmente
+        } else {
+            isFullscreenChanging = true;
+
+            if (document.fullscreenElement) {
+                isFullscreenChanging = false;
+                return;
+            } else {
+                setTimeout(() => {
+                    isFullscreenChanging = false; // Reiniciar la bandera
+                }, 200);
+            }
+        }
+    }
+
+    // Función para manejar el evento de presionar teclas
+    function handleKeyDown(event) {
+        if (event.key === "Escape") {
+            isManualExitFullscreen = true; // Marcar que la salida de fullscreen es manual
+        }
+    }
+
+    // Función para cerrar el reproductor de video en pantalla completa
+    document.getElementById('close-playerfull').addEventListener('click', () => {
+        isManualExitFullscreen = true;
+        const playerContainer = document.getElementById('player-container');
+        playerContainer.style.display = 'none';
+
+        const playerInstance = jwplayer("aRzklaXf");
+        if (playerInstance) {
+            playerInstance.remove(); // Detener y eliminar el reproductor
+        }
+
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        }
+    });
+
+    // Función para cerrar el iframe en pantalla completa
+    document.getElementById('close-iframefull').addEventListener('click', () => {
+        isManualExitFullscreen = true;
+        const iframeContainer = document.getElementById('iframe-container');
+        iframeContainer.style.display = 'none';
+
+        const iframe = document.getElementById('videoFrame');
+        iframe.src = ''; // Eliminar el contenido del iframe para detener el sonido
+
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        }
+    });
+
+    // Añadir eventos de redimensionamiento y cambio de pantalla completa
+    window.addEventListener('resize', handleResize);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Función para poner el iframe en pantalla completa
+    function toggleFullscreenIframe() {
+        const iframeContainer = document.getElementById('iframe-container');
+        const videoFrame = document.getElementById('videoFrame');
+
+        if (!document.fullscreenElement) {
+            iframeContainer.requestFullscreen().then(() => {
+                videoFrame.style.width = '100%';
+                videoFrame.style.height = '100%';
+                videoFrame.style.marginLeft = '0'; // Cambiar margin-left a 0 en pantalla completa
+                updateFullscreenButtonVisibility();
+            });
+        } else {
+            document.exitFullscreen().then(() => {
+                videoFrame.style.width = '70%';
+                videoFrame.style.height = '70%';
+                videoFrame.style.marginLeft = '15%'; // Restaurar margin-left a 15%
+                updateFullscreenButtonVisibility();
+            });
+        }
+    }
+
+    // Función para poner el reproductor de video en pantalla completa
+    function toggleFullscreenPlayer() {
+        const playerContainer = document.getElementById('player-container');
+        const playerInstance = jwplayer("aRzklaXf");
+
+        if (!document.fullscreenElement) {
+            playerContainer.requestFullscreen().then(() => {
+                playerInstance.resize("100%", "100%");
+                updateFullscreenButtonVisibility();
+            });
+        } else {
+            document.exitFullscreen().then(() => {
+                playerInstance.resize("70%", "70%");
+                updateFullscreenButtonVisibility();
+            });
+        }
+    }
+
+    // Función para actualizar la visibilidad de los botones en modo pantalla completa
+    function updateFullscreenButtonVisibility() {
+        const fullscreenIframeButton = document.getElementById('fullscreen-iframe');
+        const closeIframeButton = document.getElementById('close-iframe');
+        const closeIframeFullButton = document.getElementById('close-iframefull');
+
+        const fullscreenPlayerButton = document.getElementById('fullscreen-player');
+        const closePlayerButton = document.getElementById('close-player');
+        const closePlayerFullButton = document.getElementById('close-playerfull');
+        
+        if (document.fullscreenElement) {
+            fullscreenIframeButton.style.display = 'none';
+            closeIframeButton.style.display = 'none';
+            closeIframeFullButton.style.display = 'block';
+
+            fullscreenPlayerButton.style.display = 'none';
+            closePlayerButton.style.display = 'none';
+            closePlayerFullButton.style.display = 'block';
+        } else {
+            fullscreenIframeButton.style.display = 'flex';
+            closeIframeButton.style.display = 'block';
+            closeIframeFullButton.style.display = 'none';
+
+            fullscreenPlayerButton.style.display = 'flex';
+            closePlayerButton.style.display = 'block';
+            closePlayerFullButton.style.display = 'none';
+        }
+    }
+
+    // Agregar eventos a los botones de pantalla completa
+    document.getElementById('fullscreen-iframe').addEventListener('click', () => {
+        toggleFullscreenIframe();
+    });
+
+    document.getElementById('fullscreen-player').addEventListener('click', () => {
+        toggleFullscreenPlayer();
+    });
+
+    // Escuchar cambios en el estado de pantalla completa
+    document.addEventListener('fullscreenchange', updateFullscreenButtonVisibility);
+
+    // Inicializar la visibilidad de los botones al cargar la página
+    updateFullscreenButtonVisibility();  
 });
 
-let channelCategories = {};
+
+///////////////////////////////////////
 
 function blockDevTools(e) {
     if (
@@ -202,98 +367,17 @@ function organizeChannelCategories(channels, iframes) {
     });
 }
 
+
+
+
+
+
+
+
+
+
+
 // Función para mostrar el menú de canales
-function displayChannelMenu() {
-    const menu = document.getElementById('channel-menu');
-    menu.innerHTML = '';
-
-    // Crea el nav con la clase 'navegacion'
-    const nav = document.createElement('nav');
-    nav.className = 'navegacion';
-
-    // Si no hay categorías, muestra un mensaje
-    if (Object.keys(channelCategories).length === 0) {
-        menu.textContent = 'No se encontraron categorías.';
-        return;
-    }
-
-    // Crea el div con la clase 'nombre-pagina'
-    const divNombrePagina = document.createElement('div');
-    divNombrePagina.className = 'nombre-pagina';
-
-    // Agrega el ícono y el span al divNombrePagina
-    const icon = document.createElement('ion-icon');
-    icon.id = 'cloud';
-    icon.name = 'cloud-outline';
-
-    const span = document.createElement('span');
-    span.textContent = 'Apex';
-
-    divNombrePagina.appendChild(icon);
-    divNombrePagina.appendChild(span);
-
-    menu.appendChild(divNombrePagina);
-
-    // Agrega el divNombrePagina al nav
-    nav.appendChild(divNombrePagina);
-
-    // Crea elementos de menú para cada categoría de canal y agrégalos al nav
-    for (const [channelId, channelCategory] of Object.entries(channelCategories)) {
-        const menuItem = document.createElement('li');
-        menuItem.className = 'nav-item';
-
-        const a = document.createElement('a');
-        a.href = '#';
-
-        // Crear un span para el nombre de la categoría
-        const span = document.createElement('span');
-        span.textContent = channelCategory.name;
-
-        // Crear el ícono correspondiente según el nombre de la categoría
-        const icon = document.createElement('ion-icon');
-        if (channelCategory.name.toLowerCase().includes('tv')) {
-            icon.name = 'radio-outline';
-        } else if (channelCategory.name.toLowerCase().includes('series')) {
-            icon.name = 'play-circle-outline';
-        } else if (channelCategory.name.toLowerCase().includes('peliculas')) {
-            icon.name = 'logo-youtube';
-        } else {
-            icon.name = 'ellipse-outline'; // Default icon
-        }
-
-        // Agregar el ícono y el span al enlace
-        a.appendChild(icon);
-        a.appendChild(span);
-        menuItem.appendChild(a);
-        nav.appendChild(menuItem);
-
-        span.addEventListener('click', (event) => {
-            event.preventDefault();
-            displayTvgCategories(channelId);
-        });
-    }
-
-    // Agrega el nav al menu
-    menu.appendChild(nav);
-
-    // Agrega el event listener al ícono después de que se haya agregado al DOM
-    const cloud = document.getElementById("cloud");
-
-    const barraLateral = document.querySelector(".barra-lateral");
-    const spans = document.querySelectorAll("span");
-
-    cloud.addEventListener("click", () => {
-        barraLateral.classList.toggle("mini-barra-lateral");
-        spans.forEach((span) => {
-            span.classList.toggle("oculto");
-        });
-    });
-
-}
-
-
-
-// Función para mostrar las categorías de tvg-id
 function displayChannelMenu() {
     const menu = document.getElementById('channel-menu');
     menu.innerHTML = '';
@@ -308,10 +392,10 @@ function displayChannelMenu() {
     // Agrega el ícono y el span al divNombrePagina
     const cloudIcon = document.createElement('ion-icon');
     cloudIcon.id = 'cloud';
-    cloudIcon.name = 'radio-outline';
+    cloudIcon.name = 'cloud-outline';
 
     const apexSpan = document.createElement('span');
-    apexSpan.textContent = 'TV GRATIS';
+    apexSpan.textContent = 'TV Gratis';
 
     divNombrePagina.appendChild(cloudIcon);
     divNombrePagina.appendChild(apexSpan);
@@ -463,9 +547,8 @@ function displayChannelMenu() {
     // Agregar el nuevo contenedor al menu
     menu.appendChild(divContenedorElementos);
 
-    // Agrega el event listener al ícono después de que se haya agregado al DOM
+    // Agrega los event listeners para el modo oscuro, la barra lateral y el menú
     const cloud = document.getElementById("cloud");
-
     const barraLateral = document.querySelector(".barra-lateral");
     const spans = document.querySelectorAll("span");
     const palanca = document.querySelector(".switch");
@@ -473,24 +556,21 @@ function displayChannelMenu() {
     const men = document.querySelector(".menu");
     const main = document.querySelector("main");
 
-
-    men.addEventListener("click",()=>{
+    men.addEventListener("click", () => {
         barraLateral.classList.toggle("max-barra-lateral");
-        if(barraLateral.classList.contains("max-barra-lateral")){
+        if (barraLateral.classList.contains("max-barra-lateral")) {
             men.children[0].style.display = "none";
             men.children[1].style.display = "block";
-        }
-        else{
+        } else {
             men.children[0].style.display = "block";
             men.children[1].style.display = "none";
         }
-});
+    });
 
-
-    palanca.addEventListener("click",()=>{
-            let body = document.body;
-            body.classList.toggle("dark-mode");
-            circulo.classList.toggle("prendido");
+    palanca.addEventListener("click", () => {
+        let body = document.body;
+        body.classList.toggle("dark-mode");
+        circulo.classList.toggle("prendido");
     });
 
     cloud.addEventListener("click", () => {
@@ -501,9 +581,6 @@ function displayChannelMenu() {
         });
     });
 }
-
-
-
 
 
 

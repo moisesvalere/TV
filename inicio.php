@@ -42,20 +42,28 @@ unset($_SESSION['valid_session']);
 
     <!-- Contenedor del reproductor de video -->
     <div id="player-container" class="overlay">
-        <button id="close-player" class="btn btn-danger">X</button>
+        <button id="fullscreen-player" class="btn btn-info">PANTALLA COMPLETA</button>
+        <button id="close-player" class="btn btn-danger">Cerrar</button>
+        <button id="close-playerfull" class="btn btn-danger">X</button>
         <div id="aRzklaXf"></div>
     </div>
 
     <!-- Contenedor del iframe -->
     <div id="iframe-container" class="overlay">
-        <button id="close-iframe" class="btn btn-danger">X</button>
-        <iframe id="videoFrame" src="" sandbox="allow-scripts allow-same-origin"></iframe>
+        <button id="fullscreen-iframe" class="btn btn-info">PANTALLA COMPLETA</button>
+        <button id="close-iframe" class="btn btn-danger">Cerrar</button>
+        <button id="close-iframefull" class="btn btn-danger">X</button>
+        
+        <iframe id="videoFrame" src="" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
     </div>
 
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script src="https://jwpsrv.com/library/FfMxTl3oEeSEiiIACxmInQ.js"></script>
+    
+    
     <script src="script.js"></script>
+   
 </body>
 </html>
